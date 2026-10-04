@@ -2,19 +2,20 @@
   <main>
     <h1>Игровое поле</h1>
     <p>Карта {{ worldWidth }} × {{ worldHeight }} · шаг сетки {{ gridSize }}</p>
+    <p>Камера: удерживайте WASD или стрелки.</p>
 
     <div class="field-viewport">
       <svg
           class="game-world"
           :width="projectedWidth"
           :height="projectedHeight"
-          :viewBox="`${-projectedWidth / 2} ${-projectedHeight / 2} ${projectedWidth} ${projectedHeight}`"
+          :viewBox="`${cameraX - projectedWidth / 2} ${cameraY - projectedHeight / 2} ${projectedWidth} ${projectedHeight}`"
           role="group"
           aria-labelledby="field-title field-description"
       >
         <title id="field-title">Координатная карта RTS</title>
         <desc id="field-description">
-          Видна центральная часть изометрической карты. Начало координат в центре мира,
+          Изометрическая карта с управлением камерой через WASD или стрелки. Начало координат в центре мира,
           X растёт вправо-вниз, Y — влево-вниз. Светлые линии обозначают оси,
           ромбовидная сетка отмечает шаг в {{ gridSize }} мировых единиц.
         </desc>
@@ -49,6 +50,7 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted, onUnmounted, ref } from 'vue'
 import {
   worldWidth,
   worldHeight,
@@ -62,6 +64,63 @@ import {
 
 const xLabel = worldToScreen(160, 0)
 const yLabel = worldToScreen(0, 160)
+
+// Камера хранит координаты центра видимой области после проекции.
+const cameraX = ref(0)
+const cameraY = ref(0)
+const CAMERA_SPEED = 600 // экранных пикселей в секунду
+const pressedKeys = new Set<string>()
+const cameraKeys = ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowLeft', 'ArrowDown', 'ArrowRight']
+let animationFrame = 0
+let previousTime = 0
+
+function onKeyDown(event: KeyboardEvent) {
+  if (!cameraKeys.includes(event.code) || event.ctrlKey || event.metaKey || event.altKey) return
+  if (event.target instanceof HTMLElement && event.target.closest('input, textarea, select, [contenteditable]')) return
+
+  event.preventDefault()
+  pressedKeys.add(event.code)
+}
+
+function onKeyUp(event: KeyboardEvent) {
+  pressedKeys.delete(event.code)
+}
+
+function clearKeys() {
+  pressedKeys.clear()
+}
+
+function updateFrame(time: number) {
+  // Ограничение времени шага предотвращает скачок после неактивной вкладки.
+  const delta = Math.max(0, Math.min((time - previousTime) / 1000, 0.05))
+  previousTime = time
+  const dx = Number(pressedKeys.has('KeyD') || pressedKeys.has('ArrowRight'))
+      - Number(pressedKeys.has('KeyA') || pressedKeys.has('ArrowLeft'))
+  const dy = Number(pressedKeys.has('KeyS') || pressedKeys.has('ArrowDown'))
+      - Number(pressedKeys.has('KeyW') || pressedKeys.has('ArrowUp'))
+  const distance = CAMERA_SPEED * delta / (Math.hypot(dx, dy) || 1)
+
+  // Простые прямоугольные границы по размерам проекции карты.
+  cameraX.value = Math.max(-projectedWidth / 2, Math.min(projectedWidth / 2, cameraX.value + dx * distance))
+  cameraY.value = Math.max(-projectedHeight / 2, Math.min(projectedHeight / 2, cameraY.value + dy * distance))
+  animationFrame = requestAnimationFrame(updateFrame)
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', onKeyDown)
+  window.addEventListener('keyup', onKeyUp)
+  window.addEventListener('blur', clearKeys)
+  previousTime = performance.now()
+  animationFrame = requestAnimationFrame(updateFrame)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', onKeyDown)
+  window.removeEventListener('keyup', onKeyUp)
+  window.removeEventListener('blur', clearKeys)
+  cancelAnimationFrame(animationFrame)
+  clearKeys()
+})
 </script>
 
 <style scoped>
