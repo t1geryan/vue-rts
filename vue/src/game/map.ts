@@ -12,6 +12,13 @@ export function worldToScreen(x: number, y: number) {
     }
 }
 
+export function screenToWorld(x: number, y: number) {
+    return {
+        x: (x / tileWidth + y / tileHeight) * gridSize,
+        y: (y / tileHeight - x / tileWidth) * gridSize,
+    }
+}
+
 export const projectedWidth = ((worldWidth + worldHeight) / gridSize) * tileWidth / 2
 export const projectedHeight = ((worldWidth + worldHeight) / gridSize) * tileHeight / 2
 export const mapOutline = [
