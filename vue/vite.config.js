@@ -10,6 +10,14 @@ export default defineConfig({
     vue(),
     vueDevTools(),
   ],
+  css: {
+    preprocessorOptions: {
+      scss: {
+        // Переменные доступны в каждом <style lang="scss"> и в main.scss без явного @use
+        additionalData: `@use "@/assets/styles/variables" as *;\n`,
+      },
+    },
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))

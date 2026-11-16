@@ -1,21 +1,18 @@
 <template>
-  <g v-if="unit.selected && queuePoints.length" class="queue" pointer-events="none">
-    <polyline :points="queueLine" fill="none" stroke="#ffe08a" stroke-width="1.5" stroke-dasharray="6 4" />
+  <g v-if="unit.selected && queuePoints.length" class="queue">
+    <polyline class="queue__line" :points="queueLine" />
     <g v-for="(point, index) in queuePoints" :key="index" :transform="`translate(${point.x} ${point.y})`">
-      <ellipse rx="9" ry="5" fill="#243421" stroke="#ffe08a" stroke-width="1.5" />
-      <text y="3.5" text-anchor="middle" fill="#ffe08a" font-size="10">{{ index + 1 }}</text>
+      <ellipse class="queue__marker" rx="9" ry="5" />
+      <text class="queue__number" y="3.5" text-anchor="middle">{{ index + 1 }}</text>
     </g>
   </g>
   <ellipse
       v-if="moveEvent"
+      class="target"
       :cx="targetScreen.x"
       :cy="targetScreen.y"
       rx="7"
       ry="4"
-      fill="none"
-      stroke="#ffe08a"
-      stroke-width="2"
-      pointer-events="none"
   />
   <g
       class="unit"
@@ -29,18 +26,16 @@
       @keydown.enter.stop.prevent="emit('select', $event.shiftKey)"
       @keydown.space.stop.prevent="emit('select', $event.shiftKey)"
   >
-    <ellipse v-if="unit.selected" rx="18" ry="9" fill="none" stroke="#ffe08a" stroke-width="2" />
+    <ellipse v-if="unit.selected" class="selection" rx="18" ry="9" />
     <circle
+        :class="['body', { 'body--water': unit.terrain === 'water' }]"
         cy="-10"
         :r="UNIT_RADIUS - 1"
         :fill="groupColor(unit.group)"
-        :stroke="unit.terrain === 'water' ? '#d8f4ff' : '#493618'"
-        :stroke-dasharray="unit.terrain === 'water' ? '4 2' : undefined"
-        stroke-width="2"
     />
-    <g v-if="unit.health < unit.maxHealth" pointer-events="none">
-      <rect x="-12" y="-29" width="24" height="4" fill="#303b31" />
-      <rect x="-12" y="-29" :width="24 * unit.health / unit.maxHealth" height="4" fill="#e65a50" />
+    <g v-if="unit.health < unit.maxHealth" class="health">
+      <rect class="health__track" x="-12" y="-29" width="24" height="4" />
+      <rect class="health__value" x="-12" y="-29" :width="24 * unit.health / unit.maxHealth" height="4" />
     </g>
   </g>
 </template>
@@ -66,11 +61,68 @@ const queueLine = computed(() => [targetScreen.value, ...queuePoints.value]
 </script>
 
 <style scoped lang="scss">
+.queue {
+  pointer-events: none;
+
+  &__line {
+    fill: none;
+    stroke: $color-highlight;
+    stroke-width: 1.5;
+    stroke-dasharray: 6 4;
+  }
+
+  &__marker {
+    fill: $color-ground-dark;
+    stroke: $color-highlight;
+    stroke-width: 1.5;
+  }
+
+  &__number {
+    fill: $color-highlight;
+    font-size: 10px;
+  }
+}
+
+.target {
+  fill: none;
+  stroke: $color-highlight;
+  stroke-width: 2;
+  pointer-events: none;
+}
+
 .unit {
   cursor: pointer;
 
   &:focus:not(:focus-visible) {
     outline: none;
+  }
+
+  .selection {
+    fill: none;
+    stroke: $color-highlight;
+    stroke-width: 2;
+  }
+
+  .body {
+    stroke: $color-unit-land-stroke;
+    stroke-width: 2;
+
+    &--water {
+      stroke: $color-unit-water-stroke;
+      stroke-dasharray: 4 2;
+    }
+  }
+
+  .health {
+    pointer-events: none;
+
+    &__track {
+      fill: $color-outline-dark;
+    }
+
+    &__value {
+      fill: $color-danger;
+    }
   }
 }
 </style>
