@@ -24,25 +24,19 @@
         ромбовидная сетка отмечает шаг в {{ gridSize }} мировых единиц.
       </desc>
 
-      <polygon
-          :points="mapOutline"
-          fill="#354c2e"
-          stroke="#b9cba5"
-          stroke-width="2"
-      />
-      <polygon :points="waterOutline" fill="#426f88" stroke="#8db9ca" stroke-width="2" />
+      <polygon class="ground" :points="mapOutline" />
+      <polygon class="water" :points="waterOutline" />
       <line
           v-for="(line, index) in gridLines"
           :key="index"
+          :class="['grid-line', { 'grid-line--axis': line.isAxis }]"
           :x1="line.start.x"
           :y1="line.start.y"
           :x2="line.end.x"
           :y2="line.end.y"
-          :stroke="line.isAxis ? '#b9cba5' : '#66805b'"
-          :stroke-width="line.isAxis ? 2 : 1"
       />
-      <circle cx="0" cy="0" r="4" fill="#f0f4e7" />
-      <g fill="#f0f4e7" font-size="14">
+      <circle class="origin" cx="0" cy="0" r="4" />
+      <g class="axis-labels">
         <text x="10" y="-12">(0, 0)</text>
         <text :x="xLabel.x" :y="xLabel.y" dx="8" dy="-8">+X</text>
         <text :x="yLabel.x" :y="yLabel.y" dx="-8" dy="-8" text-anchor="end">+Y</text>
@@ -248,20 +242,51 @@ onUnmounted(() => {
   height: clamp(320px, 70vh, 720px);
   margin: 16px 0;
   overflow: clip;
-  border: 1px solid #66805b;
-  background: #243421;
+  border: 1px solid $color-border;
+  background: $color-ground-dark;
 
   .game-world {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+
+    .ground {
+      fill: $color-ground;
+      stroke: $color-border-light;
+      stroke-width: 2;
+    }
+
+    .water {
+      fill: $color-water;
+      stroke: $color-water-border;
+      stroke-width: 2;
+    }
+
+    .grid-line {
+      stroke: $color-border;
+      stroke-width: 1;
+
+      &--axis {
+        stroke: $color-border-light;
+        stroke-width: 2;
+      }
+    }
+
+    .origin,
+    .axis-labels {
+      fill: $color-text-light;
+    }
+
+    .axis-labels {
+      font-size: 14px;
+    }
   }
 
   .selection-box {
     position: absolute;
-    border: 1px solid #ffe08a;
-    background: rgba(255, 224, 138, 0.12);
+    border: 1px solid $color-highlight;
+    background: rgba($color-highlight, 0.12);
     pointer-events: none;
   }
 }

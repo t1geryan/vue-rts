@@ -11,13 +11,11 @@
       @keydown.space.stop.prevent="emit('select')"
   >
     <polygon
+        :class="['outline', { 'outline--selected': selected }]"
         :points="points"
         :fill="groupColor(object.group)"
-        fill-opacity="0.6"
-        :stroke="selected ? '#ffe08a' : '#303b31'"
-        stroke-width="2"
     />
-    <text pointer-events="none" :x="top.x" :y="top.y - 8" text-anchor="middle" fill="#fff" font-size="11">
+    <text class="health" :x="top.x" :y="top.y - 8" text-anchor="middle">
       {{ object.health }}/{{ object.maxHealth }} HP
     </text>
   </g>
@@ -41,6 +39,22 @@ const top = computed(() => corners.value[0])
 
   &:focus:not(:focus-visible) {
     outline: none;
+  }
+
+  .outline {
+    fill-opacity: 0.6;
+    stroke: $color-outline-dark;
+    stroke-width: 2;
+
+    &--selected {
+      stroke: $color-highlight;
+    }
+  }
+
+  .health {
+    fill: $color-label;
+    font-size: 11px;
+    pointer-events: none;
   }
 }
 </style>

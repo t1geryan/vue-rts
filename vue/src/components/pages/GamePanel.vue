@@ -122,9 +122,9 @@ const buildingSizes = [1, 2, 3, 4]
   gap: 24px;
   margin: 16px 0;
   padding: 12px 16px;
-  border: 1px solid #66805b;
-  background: #2c3d29;
-  color: #f0f4e7;
+  border: 1px solid $color-border;
+  background: $color-panel;
+  color: $color-text-light;
 
   h2 {
     margin: 0 0 8px;
@@ -141,10 +141,10 @@ const buildingSizes = [1, 2, 3, 4]
     grid-template-columns: auto auto;
     gap: 2px 12px;
     margin: 0 0 8px;
-  }
 
-  dd {
-    margin: 0;
+    dd {
+      margin: 0;
+    }
   }
 
   .scenario {
@@ -155,8 +155,8 @@ const buildingSizes = [1, 2, 3, 4]
 
     select {
       padding: 2px 4px;
-      border: 1px solid #b9cba5;
-      background: #354c2e;
+      border: 1px solid $color-border-light;
+      background: $color-ground;
       color: inherit;
     }
   }
@@ -169,8 +169,8 @@ const buildingSizes = [1, 2, 3, 4]
 
   button {
     padding: 4px 12px;
-    border: 1px solid #b9cba5;
-    background: #354c2e;
+    border: 1px solid $color-border-light;
+    background: $color-ground;
     color: inherit;
     cursor: pointer;
 
@@ -180,22 +180,22 @@ const buildingSizes = [1, 2, 3, 4]
     }
 
     &.active {
-      border-color: #ffe08a;
-      color: #ffe08a;
+      border-color: $color-highlight;
+      color: $color-highlight;
+    }
+
+    &.danger {
+      border-color: $color-danger;
+      color: $color-danger-light;
     }
 
     .swatch {
       display: inline-block;
       width: 10px;
       height: 10px;
-      margin-right: 4px;
-      border: 1px solid #303b31;
+      border: 1px solid $color-outline-dark;
       border-radius: 50%;
-    }
-
-    &.danger {
-      border-color: #e65a50;
-      color: #ffb3ad;
+      margin-right: 4px;
     }
   }
 }

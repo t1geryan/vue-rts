@@ -31,11 +31,8 @@
       />
       <polygon
           v-if="ghost"
+          :class="['ghost', ghostValid ? 'ghost--valid' : 'ghost--invalid']"
           :points="ghostPoints"
-          :fill="ghostValid ? 'rgba(141, 220, 120, 0.35)' : 'rgba(230, 90, 80, 0.35)'"
-          :stroke="ghostValid ? '#8ddc78' : '#e65a50'"
-          stroke-width="2"
-          pointer-events="none"
       />
       <template #overlay>
         <div v-if="winner !== null" class="map-message game-over" @mousedown.stop @click.stop>
@@ -268,15 +265,30 @@ const onCommand = (x: number, y: number, queue: boolean) => {
 </script>
 
 <style scoped lang="scss">
+.ghost {
+  stroke-width: 2;
+  pointer-events: none;
+
+  &--valid {
+    fill: rgba($color-valid, 0.35);
+    stroke: $color-valid;
+  }
+
+  &--invalid {
+    fill: rgba($color-danger, 0.35);
+    stroke: $color-danger;
+  }
+}
+
 .map-message {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   padding: 12px 24px;
-  border: 1px solid #b9cba5;
-  background: rgba(36, 52, 33, 0.85);
-  color: #f0f4e7;
+  border: 1px solid $color-border-light;
+  background: rgba($color-ground-dark, 0.85);
+  color: $color-text-light;
   font-size: 24px;
   text-align: center;
   pointer-events: none;
@@ -297,17 +309,17 @@ const onCommand = (x: number, y: number, queue: boolean) => {
       display: inline-block;
       width: 12px;
       height: 12px;
-      border: 1px solid #303b31;
+      border: 1px solid $color-outline-dark;
       border-radius: 50%;
     }
 
     button {
       padding: 4px 12px;
-      border: 1px solid #b9cba5;
-      background: #354c2e;
+      border: 1px solid $color-border-light;
+      background: $color-ground;
       color: inherit;
-      font-size: 16px;
       cursor: pointer;
+      font-size: 16px;
     }
   }
 }
